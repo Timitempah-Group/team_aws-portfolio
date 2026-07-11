@@ -10,11 +10,8 @@ role has been granted locally.
 
 ## What This Policy Does
 
-`deny-disable-security-logging` is attached to the `Portfolio-Sandbox` OU and explicitly
-denies any attempt to disable, stop, or delete GuardDuty or CloudTrail — the two services
-responsible for threat detection and audit logging. This means even a user with
-`AdministratorAccess` inside an account under this OU cannot turn off security logging,
-because the explicit Deny at the SCP layer overrides any Allow granted within the account.
+`deny-disable-security-logging` is attached to the `Portfolio-Sandbox` OU and explicitly denies any attempt to disable, stop, or delete GuardDuty or CloudTrail — the two services responsible for threat detection and audit logging. 
+This means even a user with `AdministratorAccess` inside an account under this OU cannot turn off security logging, because the explicit Deny at the SCP layer overrides any Allow granted within the account.
 
 ## Evidence
 
@@ -25,7 +22,4 @@ alongside the default `FullAWSAccess` policy every OU starts with.
 
 ## Why This Matters
 
-In a real client engagement, this is the first control put in place before any workloads
-are deployed — it guarantees that no matter who gets access to an account later, or what
-permissions they're mistakenly granted, the organisation's core security visibility can
-never be silently switched off.
+In a real client engagement, this is the first control put in place before any workloads are deployed — it guarantees that no matter who gets access to an account later, or what permissions they're mistakenly granted, the organisation's core security visibility can never be silently switched off.
