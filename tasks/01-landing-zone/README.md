@@ -1,7 +1,5 @@
 # Task 1 — Landing Zone Foundations
 
-**Handbook Reference:** Chapter 11 — Security & Governance
-
 ## What This Task Covers
 
 A Service Control Policy (SCP) is a governance control that sits above IAM in AWS's
