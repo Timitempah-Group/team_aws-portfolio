@@ -25,7 +25,7 @@ Tasks 2 and 4 predated the `default_tags` convention adopted after a tagging gap
 *A second, concurrent apply blocked by the state lock, with full lock metadata shown*
 
 ![S3 state files and DynamoDB lock table contents](screenshots/terraform-state-and-locks.png)
-*All task state files in S3, and the DynamoDB table showing only digest entries — no stuck locks*
+*All task state files in S3, and the DynamoDB table showing only per-state digest entries — no active or stuck locks present*
 
 ## Why This Matters
 
