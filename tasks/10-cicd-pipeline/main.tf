@@ -65,29 +65,8 @@ resource "aws_codedeploy_deployment_group" "web_tier" {
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
 
   deployment_style {
-    deployment_option = "WITH_TRAFFIC_CONTROL"
-    deployment_type   = "BLUE_GREEN"
-  }
-
-  blue_green_deployment_config {
-    terminate_blue_instances_on_deployment_success {
-      action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 5
-    }
-
-    deployment_ready_option {
-      action_on_timeout = "CONTINUE_DEPLOYMENT"
-    }
-
-    green_fleet_provisioning_option {
-      action = "COPY_AUTO_SCALING_GROUP"
-    }
-  }
-
-  load_balancer_info {
-    target_group_info {
-      name = "portfolio-web-tg"
-    }
+    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
+    deployment_type   = "IN_PLACE"
   }
 }
 

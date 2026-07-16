@@ -62,6 +62,33 @@ resource "aws_security_group" "web" {
   tags = { Name = "${var.name_prefix}-web-sg" }
 }
 
+resource "aws_iam_role" "ec2_codedeploy" {
+  name = "${var.name_prefix}-ec2-codedeploy-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_codedeploy" {
+  role       = aws_iam_role.ec2_codedeploy.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy"
+}
+
+resource "aws_iam_instance_profile" "web" {
+  name = "${var.name_prefix}-web-instance-profile"
+  role = aws_iam_role.ec2_codedeploy.name
+}
+
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.name_prefix}-web-"
   image_id      = data.aws_ami.amazon_linux.id
@@ -69,12 +96,23 @@ resource "aws_launch_template" "web" {
 
   vpc_security_group_ids = [aws_security_group.web.id]
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.web.name
+  }
+
   user_data = base64encode(<<-EOF
     #!/bin/bash
-    dnf install -y httpd
+    dnf install -y httpd ruby wget
     systemctl enable httpd
     systemctl start httpd
     echo "<h1>Portfolio Web Tier - $(hostname)</h1>" > /var/www/html/index.html
+
+    cd /home/ec2-user
+    wget https://aws-codedeploy-eu-west-2.s3.eu-west-2.amazonaws.com/latest/install
+    chmod +x ./install
+    ./install auto
+    systemctl enable codedeploy-agent
+    systemctl start codedeploy-agent
   EOF
   )
 
@@ -136,6 +174,13 @@ resource "aws_autoscaling_group" "web" {
   launch_template {
     id      = aws_launch_template.web.id
     version = "$Latest"
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
   }
 
   tag {
