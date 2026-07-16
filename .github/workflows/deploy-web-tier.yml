@@ -1,0 +1,40 @@
+name: Deploy Web Tier
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tasks/10-cicd-pipeline/appspec-package/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::623182520016:role/portfolio-tasks-role
+          aws-region: eu-west-2
+
+      - name: Package deployment bundle
+        run: |
+          cd tasks/10-cicd-pipeline/appspec-package
+          zip -r ../deploy-bundle.zip .
+
+      - name: Upload bundle to S3
+        run: |
+          aws s3 cp tasks/10-cicd-pipeline/deploy-bundle.zip s3://tfstate-senate-aws-portfolio/codedeploy-bundles/deploy-bundle.zip
+
+      - name: Trigger CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name portfolio-web-tier-app \
+            --deployment-group-name portfolio-web-tier-dg \
+            --s3-location bucket=tfstate-senate-aws-portfolio,key=codedeploy-bundles/deploy-bundle.zip,bundleType=zip
