@@ -3,8 +3,8 @@
 ## About
 
 Eleven builds, one rule: if it's not running in a real AWS account, it doesn't
-count. Each task tackles a genuine infrastructure problem — resilience, access
-control, cost, delivery pipelines — the way a client engagement actually demands it.
+count. Each task tackles a genuine infrastructure problem: resilience, access
+control, cost, delivery pipelines the way a client engagement actually demands it.
 
 ## Tasks
 
